@@ -80,3 +80,8 @@ body {
   color: #c8c8c8;
   background: black;
 }
+
+/* line 37, ../src/sass/style.sass */
+#viewport:active {
+  cursor: move;
+}

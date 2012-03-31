@@ -11,12 +11,13 @@
       three: 'lib/Three',
       underscore: 'lib/underscore-min.amd',
       backbone: 'lib/backbone-min.amd',
-      hogan: 'lib/hogan-1.0.5.min.amd'
+      hogan: 'lib/hogan-1.0.5.min.amd',
+      sterne: 'sterne'
     }
   });
 
-  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan'], function($, wheel, io, THREE, _, Backbone, hogan) {
-    var App, Camera, CoordLines, Viewport;
+  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan', 'sterne'], function($, wheel, io, THREE, _, Backbone, hogan, Sterne) {
+    var App, Camera, CoordLines, Renderer, Viewport;
     Camera = (function(_super) {
 
       __extends(Camera, _super);
@@ -87,11 +88,6 @@
           lines.push(this.v(-10000, 0, i * 1000), this.v(10000, 0, i * 1000));
           lines.push(this.v(i * 1000, 0, -10000), this.v(i * 1000, 0, 10000));
         }
-        /*    
-        for i in [-10..10]
-        lines.push @v(i*500, 0, -10000), @v(i*500, 0, 10000)
-        */
-        console.log(lines);
         lineGeo.vertices = lines;
         lineMat = new THREE.LineBasicMaterial({
           color: 0x222222,
@@ -103,13 +99,28 @@
       }
 
       CoordLines.prototype.v = function(x, y, z) {
-        console.log(THREE.Vertex);
         return new THREE.Vertex(new THREE.Vector3(x, y, z));
       };
 
       return CoordLines;
 
     })();
+    Renderer = (function(_super) {
+
+      __extends(Renderer, _super);
+
+      function Renderer() {
+        Renderer.__super__.constructor.call(this, {
+          antialias: true
+        });
+        $('#viewport').append(this.domElement);
+        this.setClearColorHex(0x000000, 1.0);
+        this.clear();
+      }
+
+      return Renderer;
+
+    })(THREE.WebGLRenderer);
     Viewport = (function(_super) {
 
       __extends(Viewport, _super);
@@ -121,48 +132,34 @@
 
       Viewport.prototype.el = $('#viewport');
 
-      Viewport.prototype.animate = function() {
-        var t;
-        t = new Date().getTime();
-        this.renderer.render(this.scene, this.camera);
-        return window.requestAnimationFrame(this.animate, this.renderer.domElement);
-      };
-
-      Viewport.prototype.rendererInit = function() {
-        this.renderer = new THREE.WebGLRenderer({
-          antialias: true
-        });
-        return this.$el.append(this.renderer.domElement);
-      };
-
       Viewport.prototype.initialize = function() {
-        var cube;
+        var cube, sun, time;
+        time = new Sterne.Time;
+        console.log(time.julianCentury());
+        console.log(time.julianDate());
+        sun = new Sterne.Planet;
+        sun.position(time);
+        console.log(Sterne.Planet.Sun);
         this.camera = new Camera;
-        console.log('init viewport');
-        this.rendererInit();
+        this.renderer = new Renderer;
+        this.scene = new THREE.Scene;
         this.resize();
-        this.renderer.setClearColorHex(0x000000, 1.0);
-        this.scene = new THREE.Scene();
         cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20), new THREE.ParticleBasicMaterial({
           color: 0xFFD700
         }));
-        this.scene.add(cube);
         this.coordLines = new CoordLines;
+        this.scene.add(cube);
         this.scene.add(this.coordLines);
-        /*
-                    @light0 = new THREE.AmbientLight(50, 500, 50);
-                    @light0.position.set 0, 10000, 0
-                    @scene.add @light0
-        */
         return this.animate();
       };
 
-      Viewport.prototype.render = function() {
+      Viewport.prototype.animate = function() {
+        this.renderer.render(this.scene, this.camera);
+        window.requestAnimationFrame(this.animate, this.renderer.domElement);
         return this.renderer.render(this.scene, this.camera);
       };
 
       Viewport.prototype.resize = function() {
-        console.log('resize viewport');
         this.width = $(window).width();
         this.height = $(window).height() - 5;
         this.renderer.setSize(this.width, this.height);
