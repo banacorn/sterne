@@ -1,9 +1,7 @@
-/* Welcome to Compass.
- * In this file you should write your main styles. (or centralize your imports)
- * Import this file using the following HTML or equivalent:
- * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
-
 @import "compass/reset"
+@import "compass/css3"
+@import "compass/utilities"
+
 
 @font-face
     font:
@@ -18,9 +16,19 @@
     src: local('Hammersmith One'), url('fonts/HammersmithOne.woff') format('woff')
 
 
+@function grey($v)
+    @return rgb($v, $v, $v)
+
+@mixin ditch
+    +box-shadow(white 0 1px 0, rgba(0, 0, 0, 0.5) 0 1px 3px 0 inset)    
+    +text-shadow(0 1px 1px white)
+
 
 $blau: rgb(60, 120, 180)
 
 body
-    font-family: Helvetica, Verdana, 'LiHei Pro', '微軟正黑體', '新細明體', Arial, sans-serif
+    font-family: Helvetica, Verdana, 'LiHei Pro', '微軟正黑體', '新細明體', Arial, sans-serify
+    color: grey(60)
+    background: grey(240)
+    
   
