@@ -23,7 +23,7 @@
 
       Camera.prototype.el = $('#viewport');
 
-      Camera.prototype.distance = 2000;
+      Camera.prototype.distance = 5000;
 
       Camera.prototype.alt = Math.PI / 8;
 
