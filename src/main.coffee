@@ -114,47 +114,22 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             
             @coordLines = new CoordLines
             
-            @planets = {}
-            @planets.Sun = new Sterne.PlanetView
-                size: 100
-                color: 0xE95202
-                model: Sterne.Planet.Sun
-            @planets.Mercury = new Sterne.PlanetView
-                size: 10
-                color: 0x999999
-                model: Sterne.Planet.Mercury
-            @planets.Venus = new Sterne.PlanetView
-                size: 20
-                color: 0xE0DCD9
-                model: Sterne.Planet.Venus
-            @planets.Earth = new Sterne.PlanetView
-                size: 20
-                color: 0x2E3A52
-                model: Sterne.Planet.Earth
-            @planets.Mars = new Sterne.PlanetView
-                size: 10
-                color: 0xBE8E60
-                model: Sterne.Planet.Mars
-            @planets.Jupiter = new Sterne.PlanetView
-                size: 60
-                color: 0xB38667
-                model: Sterne.Planet.Jupiter
-            @planets.Saturn = new Sterne.PlanetView
-                size: 55
-                color: 0xCEB193
-                model: Sterne.Planet.Saturn
-            @planets.Uranus = new Sterne.PlanetView
-                size: 35
-                color: 0xC0E5EB
-                model: Sterne.Planet.Uranus
-            @planets.Neptune = new Sterne.PlanetView
-                size: 35
-                color: 0x6199F0
-                model: Sterne.Planet.Neptune
             
+            @planets = new Sterne.Collection
             
-            for key, planet of @planets
+            @planets.push Sterne.Model.Sun
+            @planets.push Sterne.Model.Mercury
+            @planets.push Sterne.Model.Venus
+            @planets.push Sterne.Model.Earth
+            @planets.push Sterne.Model.Mars
+            @planets.push Sterne.Model.Jupiter
+            @planets.push Sterne.Model.Saturn
+            @planets.push Sterne.Model.Uranus
+            @planets.push Sterne.Model.Neptune
+            
+            for planet in @planets.models
                 @scene.add planet.view
+                
                 
             @scene.add @coordLines
             @animate()
@@ -168,11 +143,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         
         render: =>
             @renderer.render @scene, @camera
-            
-                        
-            for key, planet of @planets
-                planet.render @time
-        
+            @planets.render @time
         animate: =>
             @render()
             window.requestAnimationFrame(@animate, @renderer.domElement);
