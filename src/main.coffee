@@ -15,13 +15,13 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
     class Camera extends THREE.PerspectiveCamera
         
         el: $('#viewport')
-        distance: 300
-        alt: 0
-        az: 0
+        distance: 2000
+        alt: Math.PI/8
+        az: Math.PI/8
         
         constructor: ->
         
-            super 45, $(window).width()/$(window).height(), 1, 10000
+            super 45, $(window).width()/$(window).height(), 1, 100000
             
                                
             @update()
@@ -45,8 +45,8 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 startY = e.offsetY
                 
                 @el.mousemove (e) =>
-                    @az += (e.offsetX - startX) * 0.005
-                    @alt += (e.offsetY - startY) * 0.005
+                    @az += (e.offsetX - startX) * 0.002
+                    @alt += (e.offsetY - startY) * 0.002
                                         
                     @alt = Math.PI/2 if @alt > Math.PI/2
                     @alt = -Math.PI/2 if @alt < -Math.PI/2
@@ -65,18 +65,55 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 @distance *= 1.25 if delta < 0
                 
                 
-                @distance = 5000 if @distance > 5000
+                @distance = 10000 if @distance > 10000
                 @distance = 100 if @distance < 100
                                        
-                    
-                console.log @distance
                 @update()
+
+    class CoordLines
+    
+        constructor: ->
+            lineGeo = new THREE.Geometry()
+            
+            lines = []
+            
+            
+            for i in [-10..10]
+                lines.push @v(-10000, 0, i*1000), @v(10000, 0, i*1000)
+                lines.push @v(i*1000, 0, -10000), @v(i*1000, 0, 10000)
+            ###    
+            for i in [-10..10]
+            lines.push @v(i*500, 0, -10000), @v(i*500, 0, 10000)
+            ###    
+            console.log lines
+            
+            
+            
+            
+            lineGeo.vertices = lines
+            lineMat = new THREE.LineBasicMaterial
+                color: 0x333333
+                lineWidth: 1
+            line = new THREE.Line lineGeo, lineMat
+            line.type = THREE.Lines
+            return line
+            
+            
+        v: (x, y, z) -> 
+            console.log THREE.Vertex
+            new THREE.Vertex new THREE.Vector3 x, y, z
+    
 
     class Viewport extends Backbone.View
     
         el: $ '#viewport'
 
-            
+        
+        #down: ->
+            #@coordLines.material.color.setHex(0x666666)
+        #up: ->
+            #@coordLines.material.color.setHex(0x333333)
+        
         animate: =>
             t = new Date().getTime()
             @renderer.render(@scene, @camera);
@@ -103,25 +140,28 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             
             
             
-            #@renderer.setClearColorHex(0xEEEEEE, 1.0)
+            @renderer.setClearColorHex(0x000000, 1.0)
             #@renderer.clear()
             
             
             @scene = new THREE.Scene()
-            cube = new THREE.Mesh(new THREE.CubeGeometry(50,50,50),
-               new THREE.MeshPhongMaterial({color: 0xFFFFFF}))
+            cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20),
+               new THREE.ParticleBasicMaterial({color: 0xFFD700}))
             @scene.add cube
             
-            @light0 = new THREE.SpotLight();
-            @light1 = new THREE.SpotLight();
-            @light2 = new THREE.SpotLight();
-            @light0.position.set 0, 200, 0
-            @light1.position.set 50, 100, 50
-            @light2.position.set -50, 100, -50
-            @scene.add(@light0);
-            @scene.add(@light1);
-            @scene.add(@light2);
-      
+            @coordLines = new CoordLines
+            @scene.add @coordLines
+            
+            
+            
+            
+            
+            
+            ###
+            @light0 = new THREE.AmbientLight(50, 500, 50);
+            @light0.position.set 0, 10000, 0
+            @scene.add @light0
+            ###
       
             @animate()
             

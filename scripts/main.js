@@ -16,21 +16,21 @@
   });
 
   require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan'], function($, wheel, io, THREE, _, Backbone, hogan) {
-    var App, Camera, Viewport;
+    var App, Camera, CoordLines, Viewport;
     Camera = (function(_super) {
 
       __extends(Camera, _super);
 
       Camera.prototype.el = $('#viewport');
 
-      Camera.prototype.distance = 300;
+      Camera.prototype.distance = 2000;
 
-      Camera.prototype.alt = 0;
+      Camera.prototype.alt = Math.PI / 8;
 
-      Camera.prototype.az = 0;
+      Camera.prototype.az = Math.PI / 8;
 
       function Camera() {
-        Camera.__super__.constructor.call(this, 45, $(window).width() / $(window).height(), 1, 10000);
+        Camera.__super__.constructor.call(this, 45, $(window).width() / $(window).height(), 1, 100000);
         this.update();
         this.onDrag();
       }
@@ -53,8 +53,8 @@
           startX = e.offsetX;
           startY = e.offsetY;
           return _this.el.mousemove(function(e) {
-            _this.az += (e.offsetX - startX) * 0.005;
-            _this.alt += (e.offsetY - startY) * 0.005;
+            _this.az += (e.offsetX - startX) * 0.002;
+            _this.alt += (e.offsetY - startY) * 0.002;
             if (_this.alt > Math.PI / 2) _this.alt = Math.PI / 2;
             if (_this.alt < -Math.PI / 2) _this.alt = -Math.PI / 2;
             _this.update();
@@ -68,9 +68,8 @@
         return this.el.mousewheel(function(e, delta) {
           if (delta > 0) _this.distance *= 0.8;
           if (delta < 0) _this.distance *= 1.25;
-          if (_this.distance > 5000) _this.distance = 5000;
+          if (_this.distance > 10000) _this.distance = 10000;
           if (_this.distance < 100) _this.distance = 100;
-          console.log(_this.distance);
           return _this.update();
         });
       };
@@ -78,6 +77,39 @@
       return Camera;
 
     })(THREE.PerspectiveCamera);
+    CoordLines = (function() {
+
+      function CoordLines() {
+        var i, line, lineGeo, lineMat, lines;
+        lineGeo = new THREE.Geometry();
+        lines = [];
+        for (i = -10; i <= 10; i++) {
+          lines.push(this.v(-10000, 0, i * 1000), this.v(10000, 0, i * 1000));
+          lines.push(this.v(i * 1000, 0, -10000), this.v(i * 1000, 0, 10000));
+        }
+        /*    
+        for i in [-10..10]
+        lines.push @v(i*500, 0, -10000), @v(i*500, 0, 10000)
+        */
+        console.log(lines);
+        lineGeo.vertices = lines;
+        lineMat = new THREE.LineBasicMaterial({
+          color: 0x333333,
+          lineWidth: 1
+        });
+        line = new THREE.Line(lineGeo, lineMat);
+        line.type = THREE.Lines;
+        return line;
+      }
+
+      CoordLines.prototype.v = function(x, y, z) {
+        console.log(THREE.Vertex);
+        return new THREE.Vertex(new THREE.Vector3(x, y, z));
+      };
+
+      return CoordLines;
+
+    })();
     Viewport = (function(_super) {
 
       __extends(Viewport, _super);
@@ -109,20 +141,19 @@
         console.log('init viewport');
         this.rendererInit();
         this.resize();
+        this.renderer.setClearColorHex(0x000000, 1.0);
         this.scene = new THREE.Scene();
-        cube = new THREE.Mesh(new THREE.CubeGeometry(50, 50, 50), new THREE.MeshPhongMaterial({
-          color: 0xFFFFFF
+        cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20), new THREE.ParticleBasicMaterial({
+          color: 0xFFD700
         }));
         this.scene.add(cube);
-        this.light0 = new THREE.SpotLight();
-        this.light1 = new THREE.SpotLight();
-        this.light2 = new THREE.SpotLight();
-        this.light0.position.set(0, 200, 0);
-        this.light1.position.set(50, 100, 50);
-        this.light2.position.set(-50, 100, -50);
-        this.scene.add(this.light0);
-        this.scene.add(this.light1);
-        this.scene.add(this.light2);
+        this.coordLines = new CoordLines;
+        this.scene.add(this.coordLines);
+        /*
+                    @light0 = new THREE.AmbientLight(50, 500, 50);
+                    @light0.position.set 0, 10000, 0
+                    @scene.add @light0
+        */
         return this.animate();
       };
 
