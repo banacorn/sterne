@@ -94,7 +94,7 @@
         console.log(lines);
         lineGeo.vertices = lines;
         lineMat = new THREE.LineBasicMaterial({
-          color: 0x333333,
+          color: 0x222222,
           lineWidth: 1
         });
         line = new THREE.Line(lineGeo, lineMat);
