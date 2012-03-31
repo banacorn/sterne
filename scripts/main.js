@@ -11,12 +11,11 @@
       three: 'lib/Three',
       underscore: 'lib/underscore-min.amd',
       backbone: 'lib/backbone-min.amd',
-      hogan: 'lib/hogan-1.0.5.min.amd',
       sterne: 'sterne'
     }
   });
 
-  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan', 'sterne'], function($, wheel, io, THREE, _, Backbone, hogan, Sterne) {
+  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'sterne'], function($, wheel, io, THREE, _, Backbone, Sterne) {
     var App, Camera, CoordLines, Renderer, Viewport;
     Camera = (function(_super) {
 
@@ -127,36 +126,97 @@
 
       function Viewport() {
         this.animate = __bind(this.animate, this);
+        this.render = __bind(this.render, this);
         Viewport.__super__.constructor.apply(this, arguments);
       }
 
       Viewport.prototype.el = $('#viewport');
 
       Viewport.prototype.initialize = function() {
-        var cube, sun, time;
-        time = new Sterne.Time;
-        console.log(time.julianCentury());
-        console.log(time.julianDate());
-        sun = new Sterne.Planet;
-        sun.position(time);
-        console.log(Sterne.Planet.Sun);
+        var key, planet, _ref,
+          _this = this;
+        this.time = new Sterne.Time;
         this.camera = new Camera;
         this.renderer = new Renderer;
         this.scene = new THREE.Scene;
         this.resize();
-        cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20), new THREE.ParticleBasicMaterial({
-          color: 0xFFD700
-        }));
         this.coordLines = new CoordLines;
-        this.scene.add(cube);
+        this.planets = {};
+        this.planets.Sun = new Sterne.PlanetView({
+          size: 100,
+          color: 0xE95202,
+          model: Sterne.Planet.Sun
+        });
+        this.planets.Mercury = new Sterne.PlanetView({
+          size: 10,
+          color: 0x999999,
+          model: Sterne.Planet.Mercury
+        });
+        this.planets.Venus = new Sterne.PlanetView({
+          size: 20,
+          color: 0xE0DCD9,
+          model: Sterne.Planet.Venus
+        });
+        this.planets.Earth = new Sterne.PlanetView({
+          size: 20,
+          color: 0x2E3A52,
+          model: Sterne.Planet.Earth
+        });
+        this.planets.Mars = new Sterne.PlanetView({
+          size: 10,
+          color: 0xBE8E60,
+          model: Sterne.Planet.Mars
+        });
+        this.planets.Jupiter = new Sterne.PlanetView({
+          size: 60,
+          color: 0xB38667,
+          model: Sterne.Planet.Jupiter
+        });
+        this.planets.Saturn = new Sterne.PlanetView({
+          size: 55,
+          color: 0xCEB193,
+          model: Sterne.Planet.Saturn
+        });
+        this.planets.Uranus = new Sterne.PlanetView({
+          size: 35,
+          color: 0xC0E5EB,
+          model: Sterne.Planet.Uranus
+        });
+        this.planets.Neptune = new Sterne.PlanetView({
+          size: 35,
+          color: 0x6199F0,
+          model: Sterne.Planet.Neptune
+        });
+        _ref = this.planets;
+        for (key in _ref) {
+          planet = _ref[key];
+          this.scene.add(planet.view);
+        }
         this.scene.add(this.coordLines);
-        return this.animate();
+        this.animate();
+        return setInterval(function() {
+          var time;
+          time = _this.time.date.getTime();
+          time += 86400000;
+          return _this.time.date.setTime(time);
+        }, 40);
+      };
+
+      Viewport.prototype.render = function() {
+        var key, planet, _ref, _results;
+        this.renderer.render(this.scene, this.camera);
+        _ref = this.planets;
+        _results = [];
+        for (key in _ref) {
+          planet = _ref[key];
+          _results.push(planet.render(this.time));
+        }
+        return _results;
       };
 
       Viewport.prototype.animate = function() {
-        this.renderer.render(this.scene, this.camera);
-        window.requestAnimationFrame(this.animate, this.renderer.domElement);
-        return this.renderer.render(this.scene, this.camera);
+        this.render();
+        return window.requestAnimationFrame(this.animate, this.renderer.domElement);
       };
 
       Viewport.prototype.resize = function() {

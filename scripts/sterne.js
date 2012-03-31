@@ -1,7 +1,9 @@
 (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  define(function() {
-    var Planet, Time;
+  define(['backbone', 'three'], function(Backbone, THREE) {
+    var Planet, PlanetView, Planets, Time;
     Time = (function() {
 
       function Time(date) {
@@ -22,9 +24,15 @@
       return Time;
 
     })();
-    Planet = (function() {
+    Planet = (function(_super) {
 
-      function Planet(elem) {
+      __extends(Planet, _super);
+
+      function Planet() {
+        Planet.__super__.constructor.apply(this, arguments);
+      }
+
+      Planet.prototype.initialize = function(elem) {
         this.elem = elem != null ? elem : [
           {
             a: 0,
@@ -42,10 +50,12 @@
             L: 0
           }
         ];
-      }
+        return this.time = new Time;
+      };
 
       Planet.prototype.position = function(time) {
-        var CY, E, E1, RAD, TAU, iter;
+        var CY, E, E1, RAD, TAU, iter,
+          _this = this;
         this.time = time != null ? time : this.time;
         CY = this.time.julianCentury();
         RAD = Math.PI / 180;
@@ -61,7 +71,7 @@
         E1 = 0;
         iter = function() {
           E1 = E;
-          return E = E1 - (E1 - this.e * Math.sin(E1) - this.M) / (1 - this.e * Math.cis(E1));
+          return E = E1 - (E1 - _this.e * Math.sin(E1) - _this.M) / (1 - _this.e * Math.cos(E1));
         };
         while (Math.abs(E - E1) > 0.000001) {
           iter();
@@ -73,30 +83,218 @@
         return this.z = this.R * (Math.sin(this.V + this.o - this.O) * Math.sin(this.i));
       };
 
-      Planet.Sun = new Planet([(Planet.prototype.a = 0, Planet.prototype.e = 0, Planet.prototype.i = 0, Planet.prototype.O = 0, Planet.prototype.o = 0, Planet.prototype.L = 0), (Planet.prototype.a = 0, Planet.prototype.e = 0, Planet.prototype.i = 0, Planet.prototype.O = 0, Planet.prototype.o = 0, Planet.prototype.L = 0)]);
+      Planet.Sun = new Planet([
+        {
+          a: 0,
+          e: 0,
+          i: 0,
+          O: 0,
+          o: 0,
+          L: 0
+        }, {
+          a: 0,
+          e: 0,
+          i: 0,
+          O: 0,
+          o: 0,
+          L: 0
+        }
+      ]);
 
-      Planet.Mercury = new Planet([(Planet.prototype.a = 0.38709927, Planet.prototype.e = 0.20563593, Planet.prototype.i = 7.00497902, Planet.prototype.O = 48.33076593, Planet.prototype.o = 77.45779628, Planet.prototype.L = 252.25032350), (Planet.prototype.a = 0.00000037, Planet.prototype.e = 0.00001906, Planet.prototype.i = -0.00594749, Planet.prototype.L = 149472.67411175, Planet.prototype.o = 0.16047689, Planet.prototype.O = -0.12534081)]);
+      Planet.Mercury = new Planet([
+        {
+          a: 0.38709927,
+          e: 0.20563593,
+          i: 7.00497902,
+          O: 48.33076593,
+          o: 77.45779628,
+          L: 252.25032350
+        }, {
+          a: 0.00000037,
+          e: 0.00001906,
+          i: -0.00594749,
+          L: 149472.67411175,
+          o: 0.16047689,
+          O: -0.12534081
+        }
+      ]);
 
-      Planet.Venus = new Planet([(Planet.prototype.a = 0.72333566, Planet.prototype.e = 0.00677672, Planet.prototype.i = 3.39467605, Planet.prototype.O = 76.67984255, Planet.prototype.o = 131.60246718, Planet.prototype.L = 181.97909950), (Planet.prototype.a = 0.00000390, Planet.prototype.e = -0.00004107, Planet.prototype.i = -0.00078890, Planet.prototype.O = -0.27769418, Planet.prototype.o = 0.00268329, Planet.prototype.L = 58517.81538729)]);
+      Planet.Venus = new Planet([
+        {
+          a: 0.72333566,
+          e: 0.00677672,
+          i: 3.39467605,
+          O: 76.67984255,
+          o: 131.60246718,
+          L: 181.97909950
+        }, {
+          a: 0.00000390,
+          e: -0.00004107,
+          i: -0.00078890,
+          O: -0.27769418,
+          o: 0.00268329,
+          L: 58517.81538729
+        }
+      ]);
 
-      Planet.Earth = new Planet([(Planet.prototype.a = 1.00000261, Planet.prototype.e = 0.01671123, Planet.prototype.i = -0.00001531, Planet.prototype.O = 0.0, Planet.prototype.o = 102.93768193, Planet.prototype.L = 100.46457166), (Planet.prototype.a = 0.00000562, Planet.prototype.e = -0.00004392, Planet.prototype.i = -0.01294668, Planet.prototype.O = 0.0, Planet.prototype.o = 0.32327364, Planet.prototype.L = 35999.37244981)]);
+      Planet.Earth = new Planet([
+        {
+          a: 1.00000261,
+          e: 0.01671123,
+          i: -0.00001531,
+          O: 0.0,
+          o: 102.93768193,
+          L: 100.46457166
+        }, {
+          a: 0.00000562,
+          e: -0.00004392,
+          i: -0.01294668,
+          O: 0.0,
+          o: 0.32327364,
+          L: 35999.37244981
+        }
+      ]);
 
-      Planet.Mars = new Planet([(Planet.prototype.a = 1.52371034, Planet.prototype.e = 0.09339410, Planet.prototype.i = 1.84969142, Planet.prototype.O = 49.55953891, Planet.prototype.o = -23.94362959, Planet.prototype.L = -4.55343205), (Planet.prototype.a = 0.00001847, Planet.prototype.e = 0.00007882, Planet.prototype.i = -0.00813131, Planet.prototype.O = -0.29257343, Planet.prototype.o = 0.44441088, Planet.prototype.L = 19140.30268499)]);
+      Planet.Mars = new Planet([
+        {
+          a: 1.52371034,
+          e: 0.09339410,
+          i: 1.84969142,
+          O: 49.55953891,
+          o: -23.94362959,
+          L: -4.55343205
+        }, {
+          a: 0.00001847,
+          e: 0.00007882,
+          i: -0.00813131,
+          O: -0.29257343,
+          o: 0.44441088,
+          L: 19140.30268499
+        }
+      ]);
 
-      Planet.Jupiter = new Planet([(Planet.prototype.a = 5.20288700, Planet.prototype.e = 0.04838624, Planet.prototype.i = 1.30439695, Planet.prototype.O = 100.47390909, Planet.prototype.o = 14.72847983, Planet.prototype.L = 34.39644051), (Planet.prototype.a = -0.00011607, Planet.prototype.e = -0.00013253, Planet.prototype.i = -0.00183714, Planet.prototype.O = 0.20469106, Planet.prototype.o = 0.21252668, Planet.prototype.L = 3034.74612775)]);
+      Planet.Jupiter = new Planet([
+        {
+          a: 5.20288700,
+          e: 0.04838624,
+          i: 1.30439695,
+          O: 100.47390909,
+          o: 14.72847983,
+          L: 34.39644051
+        }, {
+          a: -0.00011607,
+          e: -0.00013253,
+          i: -0.00183714,
+          O: 0.20469106,
+          o: 0.21252668,
+          L: 3034.74612775
+        }
+      ]);
 
-      Planet.Saturn = new Planet([(Planet.prototype.a = 9.53667594, Planet.prototype.e = 0.05386179, Planet.prototype.i = 2.48599187, Planet.prototype.O = 113.66242448, Planet.prototype.o = 92.59887831, Planet.prototype.L = 49.95424423), (Planet.prototype.a = -0.00125060, Planet.prototype.e = -0.00050991, Planet.prototype.i = 0.00193609, Planet.prototype.O = -0.28867794, Planet.prototype.o = -0.41897216, Planet.prototype.L = 1222.49362201)]);
+      Planet.Saturn = new Planet([
+        {
+          a: 9.53667594,
+          e: 0.05386179,
+          i: 2.48599187,
+          O: 113.66242448,
+          o: 92.59887831,
+          L: 49.95424423
+        }, {
+          a: -0.00125060,
+          e: -0.00050991,
+          i: 0.00193609,
+          O: -0.28867794,
+          o: -0.41897216,
+          L: 1222.49362201
+        }
+      ]);
 
-      Planet.Uranus = new Planet([(Planet.prototype.a = 19.18916464, Planet.prototype.e = 0.04725744, Planet.prototype.i = 0.77263783, Planet.prototype.O = 74.01692503, Planet.prototype.o = 170.95427630, Planet.prototype.L = 313.23810451), (Planet.prototype.a = -0.00196176, Planet.prototype.e = -0.00004397, Planet.prototype.i = -0.00242939, Planet.prototype.O = 0.04240589, Planet.prototype.o = 0.40805281, Planet.prototype.L = 428.48202785)]);
+      Planet.Uranus = new Planet([
+        {
+          a: 19.18916464,
+          e: 0.04725744,
+          i: 0.77263783,
+          O: 74.01692503,
+          o: 170.95427630,
+          L: 313.23810451
+        }, {
+          a: -0.00196176,
+          e: -0.00004397,
+          i: -0.00242939,
+          O: 0.04240589,
+          o: 0.40805281,
+          L: 428.48202785
+        }
+      ]);
 
-      Planet.Neptune = new Planet([(Planet.prototype.a = 30.06992276, Planet.prototype.e = 0.00859048, Planet.prototype.i = 1.77004347, Planet.prototype.O = 131.78422574, Planet.prototype.o = 44.96476227, Planet.prototype.L = -55.12002969), (Planet.prototype.a = 0.00026291, Planet.prototype.e = 0.00005105, Planet.prototype.i = 0.00035372, Planet.prototype.O = -0.00508664, Planet.prototype.o = -0.32241464, Planet.prototype.L = 218.45945325)]);
+      Planet.Neptune = new Planet([
+        {
+          a: 30.06992276,
+          e: 0.00859048,
+          i: 1.77004347,
+          O: 131.78422574,
+          o: 44.96476227,
+          L: -55.12002969
+        }, {
+          a: 0.00026291,
+          e: 0.00005105,
+          i: 0.00035372,
+          O: -0.00508664,
+          o: -0.32241464,
+          L: 218.45945325
+        }
+      ]);
 
       return Planet;
 
-    })();
+    })(Backbone.Model);
+    Planets = (function(_super) {
+
+      __extends(Planets, _super);
+
+      function Planets() {
+        Planets.__super__.constructor.apply(this, arguments);
+      }
+
+      Planets.prototype.model = Planet;
+
+      return Planets;
+
+    })(Backbone.Collection);
+    PlanetView = (function(_super) {
+
+      __extends(PlanetView, _super);
+
+      function PlanetView() {
+        PlanetView.__super__.constructor.apply(this, arguments);
+      }
+
+      PlanetView.prototype.model = Planet;
+
+      PlanetView.prototype.color = 0xFFFFFF;
+
+      PlanetView.prototype.initialize = function(options) {
+        this.color = options.color;
+        this.size = options.size;
+        return this.view = new THREE.Mesh(new THREE.SphereGeometry(this.size, 20, 20), new THREE.ParticleBasicMaterial({
+          color: this.color
+        }));
+      };
+
+      PlanetView.prototype.render = function(time) {
+        this.model.position(time);
+        this.view.position.x = this.model.x * -1000;
+        this.view.position.y = this.model.z * 1000;
+        return this.view.position.z = this.model.y * 1000;
+      };
+
+      return PlanetView;
+
+    })(Backbone.View);
     return {
       Time: Time,
-      Planet: Planet
+      Planet: Planet,
+      PlanetView: PlanetView
     };
   });
 

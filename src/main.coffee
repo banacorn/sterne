@@ -6,10 +6,9 @@ require.config
         three: 'lib/Three'
         underscore: 'lib/underscore-min.amd'
         backbone: 'lib/backbone-min.amd'
-        hogan: 'lib/hogan-1.0.5.min.amd'
         sterne: 'sterne'
         
-require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan', 'sterne'], ($, wheel, io, THREE, _, Backbone, hogan, Sterne) ->
+require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'sterne'], ($, wheel, io, THREE, _, Backbone, Sterne) ->
     
 
 
@@ -81,6 +80,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         v: (x, y, z) -> 
             new THREE.Vertex new THREE.Vector3 x, y, z
     
+            
 
     class Renderer extends THREE.WebGLRenderer
         constructor: ->
@@ -99,44 +99,78 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
 
             
         initialize: ->
-                    
-            time = new Sterne.Time
-            
         
-            console.log time.julianCentury()
-            console.log time.julianDate()
-        
-            sun = new Sterne.Planet
-            sun.position(time)
-            
-            console.log Sterne.Planet.Sun
-        
-        
+            @time = new Sterne.Time
         
             @camera = new Camera        
             @renderer = new Renderer
             @scene = new THREE.Scene            
             @resize()
             
-            
-            cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20),
-               new THREE.ParticleBasicMaterial({color: 0xFFD700}))
-            
             @coordLines = new CoordLines
             
+            @planets = {}
+            @planets.Sun = new Sterne.PlanetView
+                size: 100
+                color: 0xE95202
+                model: Sterne.Planet.Sun
+            @planets.Mercury = new Sterne.PlanetView
+                size: 10
+                color: 0x999999
+                model: Sterne.Planet.Mercury
+            @planets.Venus = new Sterne.PlanetView
+                size: 20
+                color: 0xE0DCD9
+                model: Sterne.Planet.Venus
+            @planets.Earth = new Sterne.PlanetView
+                size: 20
+                color: 0x2E3A52
+                model: Sterne.Planet.Earth
+            @planets.Mars = new Sterne.PlanetView
+                size: 10
+                color: 0xBE8E60
+                model: Sterne.Planet.Mars
+            @planets.Jupiter = new Sterne.PlanetView
+                size: 60
+                color: 0xB38667
+                model: Sterne.Planet.Jupiter
+            @planets.Saturn = new Sterne.PlanetView
+                size: 55
+                color: 0xCEB193
+                model: Sterne.Planet.Saturn
+            @planets.Uranus = new Sterne.PlanetView
+                size: 35
+                color: 0xC0E5EB
+                model: Sterne.Planet.Uranus
+            @planets.Neptune = new Sterne.PlanetView
+                size: 35
+                color: 0x6199F0
+                model: Sterne.Planet.Neptune
             
             
-            
-            
-            @scene.add cube
+            for key, planet of @planets
+                @scene.add planet.view
+                
             @scene.add @coordLines
             @animate()
             
         
-        animate: =>
-            @renderer.render(@scene, @camera);
-            window.requestAnimationFrame(@animate, @renderer.domElement);
+            setInterval =>
+                time = @time.date.getTime()
+                time += 86400000
+                @time.date.setTime time
+            , 40
+        
+        render: =>
             @renderer.render @scene, @camera
+            
+                        
+            for key, planet of @planets
+                planet.render @time
+        
+        animate: =>
+            @render()
+            window.requestAnimationFrame(@animate, @renderer.domElement);
             
             
         resize: ->            
