@@ -54,7 +54,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             @el.mousewheel (e, delta) =>            
                 @distance *= 0.8 if delta > 0
                 @distance *= 1.25 if delta < 0    
-                @distance = 10000 if @distance > 10000
+                @distance = 20000 if @distance > 20000
                 @distance = 100 if @distance < 100                                       
                 @update()
 
@@ -64,13 +64,13 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             lineGeo = new THREE.Geometry()            
             lines = []            
             
-            for i in [-10..10]
-                lines.push @v(-10000, 0, i*1000), @v(10000, 0, i*1000)
-                lines.push @v(i*1000, 0, -10000), @v(i*1000, 0, 10000)
+            for i in [-20..20]
+                lines.push @v(-20000, 0, i*1000), @v(20000, 0, i*1000)
+                lines.push @v(i*1000, 0, -20000), @v(i*1000, 0, 20000)
             
             lineGeo.vertices = lines
             lineMat = new THREE.LineBasicMaterial
-                color: 0x222222
+                color: 0x111111
                 lineWidth: 1
             line = new THREE.Line lineGeo, lineMat
             line.type = THREE.Lines
@@ -157,9 +157,9 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         
             setInterval =>
                 time = @time.date.getTime()
-                time += 86400000
+                time += 8640000
                 @time.date.setTime time
-            , 40
+            , 10
         
         render: =>
             @renderer.render @scene, @camera

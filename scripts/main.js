@@ -68,7 +68,7 @@
         return this.el.mousewheel(function(e, delta) {
           if (delta > 0) _this.distance *= 0.8;
           if (delta < 0) _this.distance *= 1.25;
-          if (_this.distance > 10000) _this.distance = 10000;
+          if (_this.distance > 20000) _this.distance = 20000;
           if (_this.distance < 100) _this.distance = 100;
           return _this.update();
         });
@@ -83,13 +83,13 @@
         var i, line, lineGeo, lineMat, lines;
         lineGeo = new THREE.Geometry();
         lines = [];
-        for (i = -10; i <= 10; i++) {
-          lines.push(this.v(-10000, 0, i * 1000), this.v(10000, 0, i * 1000));
-          lines.push(this.v(i * 1000, 0, -10000), this.v(i * 1000, 0, 10000));
+        for (i = -20; i <= 20; i++) {
+          lines.push(this.v(-20000, 0, i * 1000), this.v(20000, 0, i * 1000));
+          lines.push(this.v(i * 1000, 0, -20000), this.v(i * 1000, 0, 20000));
         }
         lineGeo.vertices = lines;
         lineMat = new THREE.LineBasicMaterial({
-          color: 0x222222,
+          color: 0x111111,
           lineWidth: 1
         });
         line = new THREE.Line(lineGeo, lineMat);
@@ -197,9 +197,9 @@
         return setInterval(function() {
           var time;
           time = _this.time.date.getTime();
-          time += 86400000;
+          time += 8640000;
           return _this.time.date.setTime(time);
-        }, 40);
+        }, 10);
       };
 
       Viewport.prototype.render = function() {
