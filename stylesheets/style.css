@@ -76,7 +76,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 
 /* line 29, ../src/sass/style.sass */
 body {
-  font-family: Helvetica, Verdana, "LiHei Pro", "微軟正黑體", "新細明體", Arial, sans-serify;
-  color: #3c3c3c;
-  background: #f0f0f0;
+  font-family: Helvetica, Verdana, "LiHei Pro", "微軟正黑體", "新細明體", Arial, sans-serif;
+  color: #c8c8c8;
+  background: black;
 }

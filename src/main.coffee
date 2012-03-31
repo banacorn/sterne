@@ -92,7 +92,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             
             lineGeo.vertices = lines
             lineMat = new THREE.LineBasicMaterial
-                color: 0x333333
+                color: 0x222222
                 lineWidth: 1
             line = new THREE.Line lineGeo, lineMat
             line.type = THREE.Lines
@@ -108,11 +108,6 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
     
         el: $ '#viewport'
 
-        
-        #down: ->
-            #@coordLines.material.color.setHex(0x666666)
-        #up: ->
-            #@coordLines.material.color.setHex(0x333333)
         
         animate: =>
             t = new Date().getTime()
