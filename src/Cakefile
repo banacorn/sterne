@@ -6,11 +6,11 @@ baker = require 'baker'
 #### Baker ####
 
 # open all files in src/ with gedit
-baker.open 'gedit', ['', '!config.rb', '!Cakefile']
+baker.open 'gedit', ['', '!config.rb', '!Cakefile', '!node_modules']
   
 baker.watch '.sass', [''], (source) -> "compass compile"
 
-baker.watch '.coffee', ['./', '!node_modules'], (source) -> "coffee -o ../scripts #{ source }"
+baker.watch '.coffee', ['', '!node_modules'], (source) -> "coffee -o ../scripts #{ source }"
 
 option '-l', '--list', 'list all target liles'
 
