@@ -23,6 +23,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             super 45, $(window).width()/$(window).height(), 1, 100000                               
             @update()
             @onDrag()
+            @onScroll()
             
         update: ->
             @position.x = (@distance * Math.cos @az) * Math.cos @alt
@@ -35,28 +36,32 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 
         onDrag: ->
         
+        
+        
             @el.mousedown (e) =>                        
-                startX = e.offsetX
-                startY = e.offsetY  
-                              
+                startX = e.clientX
+                startY = e.clientY  
+                
                 @el.mousemove (e) =>                
-                    @az += (e.offsetX - startX) * 0.002
-                    @alt += (e.offsetY - startY) * 0.002                                        
+                    @az += (e.clientX - startX) * 0.002
+                    @alt += (e.clientY - startY) * 0.002                                        
                     @alt = Math.PI/2 if @alt > Math.PI/2
                     @alt = -Math.PI/2 if @alt < -Math.PI/2                    
                     @update()                    
-                    startX = e.offsetX
-                    startY = e.offsetY
-                                
+                    startX = e.clientX
+                    startY = e.clientY   
+                      
             @el.mouseup (e) =>
                 @el.off 'mousemove'
-                
+            
+        onScroll: ->
             @el.mousewheel (e, delta) =>            
                 @distance *= 0.8 if delta > 0
                 @distance *= 1.25 if delta < 0    
                 @distance = 20000 if @distance > 20000
                 @distance = 100 if @distance < 100                                       
                 @update()
+            
 
     class CoordLines
     

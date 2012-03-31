@@ -33,6 +33,7 @@
         Camera.__super__.constructor.call(this, 45, $(window).width() / $(window).height(), 1, 100000);
         this.update();
         this.onDrag();
+        this.onScroll();
       }
 
       Camera.prototype.update = function() {
@@ -50,21 +51,25 @@
         var _this = this;
         this.el.mousedown(function(e) {
           var startX, startY;
-          startX = e.offsetX;
-          startY = e.offsetY;
+          startX = e.clientX;
+          startY = e.clientY;
           return _this.el.mousemove(function(e) {
-            _this.az += (e.offsetX - startX) * 0.002;
-            _this.alt += (e.offsetY - startY) * 0.002;
+            _this.az += (e.clientX - startX) * 0.002;
+            _this.alt += (e.clientY - startY) * 0.002;
             if (_this.alt > Math.PI / 2) _this.alt = Math.PI / 2;
             if (_this.alt < -Math.PI / 2) _this.alt = -Math.PI / 2;
             _this.update();
-            startX = e.offsetX;
-            return startY = e.offsetY;
+            startX = e.clientX;
+            return startY = e.clientY;
           });
         });
-        this.el.mouseup(function(e) {
+        return this.el.mouseup(function(e) {
           return _this.el.off('mousemove');
         });
+      };
+
+      Camera.prototype.onScroll = function() {
+        var _this = this;
         return this.el.mousewheel(function(e, delta) {
           if (delta > 0) _this.distance *= 0.8;
           if (delta < 0) _this.distance *= 1.25;
