@@ -169,6 +169,5 @@ define ['backbone', 'three'], (Backbone, THREE) ->
     return (
         Time: Time
         Model: Model
-        View: View
         Collection: Collection
     )
