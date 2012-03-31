@@ -14,7 +14,7 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             
             @date.getUTCDate()+Math.floor((m*153+2)/5)+y*365+Math.floor(y/4)-Math.floor(y/100)+Math.floor(y/400)-32045+(@date.getUTCHours()-12)/24+@date.getUTCMinutes()/1440+@date.getUTCSeconds()/86400;     
             
-    class Planet extends Backbone.Model
+    class Model extends Backbone.Model
         initialize: (@elem = [
             (a: 0, e: 0, i: 0, O: 0, o: 0, L: 0)
             (a: 0, e: 0, i: 0, O: 0, o: 0, L: 0)
@@ -54,48 +54,48 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             @y = @R * (Math.sin(@O) * Math.cos(@V + @o - @O) +  Math.cos(@O) * Math.sin(@V + @o - @O) * Math.cos(@i));
             @z = @R * (Math.sin(@V + @o - @O) * Math.sin(@i));
         
-        @Sun: new Planet [
+        @Sun: new Model [
             { a: 0, e: 0, i: 0, O: 0, o: 0, L: 0 }
             { a: 0, e: 0, i: 0, O: 0, o: 0, L: 0 }
         ]
-        @Mercury: new Planet [
+        @Mercury: new Model [
             { a: 0.38709927, e: 0.20563593, i: 7.00497902, O: 48.33076593, o: 77.45779628, L: 252.25032350 }
             { a: 0.00000037, e: 0.00001906, i: -0.00594749, L: 149472.67411175, o: 0.16047689, O: -0.12534081 }
         ]
-        @Venus = new Planet [
+        @Venus = new Model [
             { a: 0.72333566, e: 0.00677672, i: 3.39467605, O: 76.67984255, o: 131.60246718, L: 181.97909950 }
             { a: 0.00000390, e: -0.00004107, i: -0.00078890, O: -0.27769418, o: 0.00268329, L: 58517.81538729 }
         ]
-        @Earth = new Planet [        
+        @Earth = new Model [        
             { a: 1.00000261, e: 0.01671123, i: -0.00001531, O: 0.0, o: 102.93768193, L: 100.46457166 }
             { a: 0.00000562, e: -0.00004392, i: -0.01294668, O: 0.0, o: 0.32327364, L: 35999.37244981 }
         ]
-        @Mars = new Planet [        
+        @Mars = new Model [        
             { a: 1.52371034, e: 0.09339410, i: 1.84969142, O: 49.55953891, o: -23.94362959, L: -4.55343205 }
             { a: 0.00001847, e: 0.00007882, i: -0.00813131, O: -0.29257343, o: 0.44441088, L: 19140.30268499 }
         ]
-        @Jupiter = new Planet [   
+        @Jupiter = new Model [   
             { a: 5.20288700, e: 0.04838624, i: 1.30439695, O: 100.47390909, o: 14.72847983, L: 34.39644051 }
             { a: -0.00011607, e: -0.00013253, i: -0.00183714, O: 0.20469106, o: 0.21252668, L: 3034.74612775 }
         ]
-        @Saturn = new Planet [        
+        @Saturn = new Model [        
             { a: 9.53667594, e: 0.05386179, i: 2.48599187, O: 113.66242448, o: 92.59887831, L: 49.95424423 }
             { a: -0.00125060, e: -0.00050991, i: 0.00193609, O: -0.28867794, o: -0.41897216, L: 1222.49362201 }
         ]
-        @Uranus = new Planet [        
+        @Uranus = new Model [        
             { a: 19.18916464, e: 0.04725744, i: 0.77263783, O: 74.01692503, o: 170.95427630, L: 313.23810451 }
             { a: -0.00196176, e: -0.00004397, i: -0.00242939, O: 0.04240589, o: 0.40805281, L: 428.48202785 }
         ]
-        @Neptune = new Planet [        
+        @Neptune = new Model [        
             { a: 30.06992276, e: 0.00859048, i: 1.77004347, O: 131.78422574, o: 44.96476227, L: -55.12002969 }
             { a: 0.00026291, e: 0.00005105, i: 0.00035372, O: -0.00508664, o: -0.32241464, L: 218.45945325 }
         ]
            
-    class Planets extends Backbone.Collection
-        model: Planet
+    class Collection extends Backbone.Collection
+        model: Model
     
-    class PlanetView extends Backbone.View
-        model: Planet
+    class View extends Backbone.View
+        model: Model
         color: 0xFFFFFF
         initialize: (options) ->
             @color = options.color
@@ -111,6 +111,7 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             
     return (
         Time: Time
-        Planet: Planet
-        PlanetView: PlanetView
+        Model: Model
+        View: View
+        Collection: Collection
     )

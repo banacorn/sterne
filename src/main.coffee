@@ -110,42 +110,42 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             @coordLines = new CoordLines
             
             @planets = {}
-            @planets.Sun = new Sterne.PlanetView
+            @planets.Sun = new Sterne.View
                 size: 100
                 color: 0xE95202
-                model: Sterne.Planet.Sun
-            @planets.Mercury = new Sterne.PlanetView
+                model: Sterne.Model.Sun
+            @planets.Mercury = new Sterne.View
                 size: 10
                 color: 0x999999
-                model: Sterne.Planet.Mercury
-            @planets.Venus = new Sterne.PlanetView
+                model: Sterne.Model.Mercury
+            @planets.Venus = new Sterne.View
                 size: 20
                 color: 0xE0DCD9
-                model: Sterne.Planet.Venus
-            @planets.Earth = new Sterne.PlanetView
+                model: Sterne.Model.Venus
+            @planets.Earth = new Sterne.View
                 size: 20
                 color: 0x2E3A52
-                model: Sterne.Planet.Earth
-            @planets.Mars = new Sterne.PlanetView
+                model: Sterne.Model.Earth
+            @planets.Mars = new Sterne.View
                 size: 10
                 color: 0xBE8E60
-                model: Sterne.Planet.Mars
-            @planets.Jupiter = new Sterne.PlanetView
+                model: Sterne.Model.Mars
+            @planets.Jupiter = new Sterne.View
                 size: 60
                 color: 0xB38667
-                model: Sterne.Planet.Jupiter
-            @planets.Saturn = new Sterne.PlanetView
+                model: Sterne.Model.Jupiter
+            @planets.Saturn = new Sterne.View
                 size: 55
                 color: 0xCEB193
-                model: Sterne.Planet.Saturn
-            @planets.Uranus = new Sterne.PlanetView
+                model: Sterne.Model.Saturn
+            @planets.Uranus = new Sterne.View
                 size: 35
                 color: 0xC0E5EB
-                model: Sterne.Planet.Uranus
-            @planets.Neptune = new Sterne.PlanetView
+                model: Sterne.Model.Uranus
+            @planets.Neptune = new Sterne.View
                 size: 35
                 color: 0x6199F0
-                model: Sterne.Planet.Neptune
+                model: Sterne.Model.Neptune
             
             
             for key, planet of @planets

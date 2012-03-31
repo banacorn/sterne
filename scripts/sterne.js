@@ -3,7 +3,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   define(['backbone', 'three'], function(Backbone, THREE) {
-    var Planet, PlanetView, Planets, Time;
+    var Collection, Model, Time, View;
     Time = (function() {
 
       function Time(date) {
@@ -24,15 +24,15 @@
       return Time;
 
     })();
-    Planet = (function(_super) {
+    Model = (function(_super) {
 
-      __extends(Planet, _super);
+      __extends(Model, _super);
 
-      function Planet() {
-        Planet.__super__.constructor.apply(this, arguments);
+      function Model() {
+        Model.__super__.constructor.apply(this, arguments);
       }
 
-      Planet.prototype.initialize = function(elem) {
+      Model.prototype.initialize = function(elem) {
         this.elem = elem != null ? elem : [
           {
             a: 0,
@@ -53,7 +53,7 @@
         return this.time = new Time;
       };
 
-      Planet.prototype.position = function(time) {
+      Model.prototype.position = function(time) {
         var CY, E, E1, RAD, TAU, iter,
           _this = this;
         this.time = time != null ? time : this.time;
@@ -83,7 +83,7 @@
         return this.z = this.R * (Math.sin(this.V + this.o - this.O) * Math.sin(this.i));
       };
 
-      Planet.Sun = new Planet([
+      Model.Sun = new Model([
         {
           a: 0,
           e: 0,
@@ -101,7 +101,7 @@
         }
       ]);
 
-      Planet.Mercury = new Planet([
+      Model.Mercury = new Model([
         {
           a: 0.38709927,
           e: 0.20563593,
@@ -119,7 +119,7 @@
         }
       ]);
 
-      Planet.Venus = new Planet([
+      Model.Venus = new Model([
         {
           a: 0.72333566,
           e: 0.00677672,
@@ -137,7 +137,7 @@
         }
       ]);
 
-      Planet.Earth = new Planet([
+      Model.Earth = new Model([
         {
           a: 1.00000261,
           e: 0.01671123,
@@ -155,7 +155,7 @@
         }
       ]);
 
-      Planet.Mars = new Planet([
+      Model.Mars = new Model([
         {
           a: 1.52371034,
           e: 0.09339410,
@@ -173,7 +173,7 @@
         }
       ]);
 
-      Planet.Jupiter = new Planet([
+      Model.Jupiter = new Model([
         {
           a: 5.20288700,
           e: 0.04838624,
@@ -191,7 +191,7 @@
         }
       ]);
 
-      Planet.Saturn = new Planet([
+      Model.Saturn = new Model([
         {
           a: 9.53667594,
           e: 0.05386179,
@@ -209,7 +209,7 @@
         }
       ]);
 
-      Planet.Uranus = new Planet([
+      Model.Uranus = new Model([
         {
           a: 19.18916464,
           e: 0.04725744,
@@ -227,7 +227,7 @@
         }
       ]);
 
-      Planet.Neptune = new Planet([
+      Model.Neptune = new Model([
         {
           a: 30.06992276,
           e: 0.00859048,
@@ -245,35 +245,35 @@
         }
       ]);
 
-      return Planet;
+      return Model;
 
     })(Backbone.Model);
-    Planets = (function(_super) {
+    Collection = (function(_super) {
 
-      __extends(Planets, _super);
+      __extends(Collection, _super);
 
-      function Planets() {
-        Planets.__super__.constructor.apply(this, arguments);
+      function Collection() {
+        Collection.__super__.constructor.apply(this, arguments);
       }
 
-      Planets.prototype.model = Planet;
+      Collection.prototype.model = Model;
 
-      return Planets;
+      return Collection;
 
     })(Backbone.Collection);
-    PlanetView = (function(_super) {
+    View = (function(_super) {
 
-      __extends(PlanetView, _super);
+      __extends(View, _super);
 
-      function PlanetView() {
-        PlanetView.__super__.constructor.apply(this, arguments);
+      function View() {
+        View.__super__.constructor.apply(this, arguments);
       }
 
-      PlanetView.prototype.model = Planet;
+      View.prototype.model = Model;
 
-      PlanetView.prototype.color = 0xFFFFFF;
+      View.prototype.color = 0xFFFFFF;
 
-      PlanetView.prototype.initialize = function(options) {
+      View.prototype.initialize = function(options) {
         this.color = options.color;
         this.size = options.size;
         return this.view = new THREE.Mesh(new THREE.SphereGeometry(this.size, 20, 20), new THREE.ParticleBasicMaterial({
@@ -281,20 +281,21 @@
         }));
       };
 
-      PlanetView.prototype.render = function(time) {
+      View.prototype.render = function(time) {
         this.model.position(time);
         this.view.position.x = this.model.x * -1000;
         this.view.position.y = this.model.z * 1000;
         return this.view.position.z = this.model.y * 1000;
       };
 
-      return PlanetView;
+      return View;
 
     })(Backbone.View);
     return {
       Time: Time,
-      Planet: Planet,
-      PlanetView: PlanetView
+      Model: Model,
+      View: View,
+      Collection: Collection
     };
   });
 

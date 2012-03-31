@@ -142,50 +142,50 @@
         this.resize();
         this.coordLines = new CoordLines;
         this.planets = {};
-        this.planets.Sun = new Sterne.PlanetView({
+        this.planets.Sun = new Sterne.View({
           size: 100,
           color: 0xE95202,
-          model: Sterne.Planet.Sun
+          model: Sterne.Model.Sun
         });
-        this.planets.Mercury = new Sterne.PlanetView({
+        this.planets.Mercury = new Sterne.View({
           size: 10,
           color: 0x999999,
-          model: Sterne.Planet.Mercury
+          model: Sterne.Model.Mercury
         });
-        this.planets.Venus = new Sterne.PlanetView({
+        this.planets.Venus = new Sterne.View({
           size: 20,
           color: 0xE0DCD9,
-          model: Sterne.Planet.Venus
+          model: Sterne.Model.Venus
         });
-        this.planets.Earth = new Sterne.PlanetView({
+        this.planets.Earth = new Sterne.View({
           size: 20,
           color: 0x2E3A52,
-          model: Sterne.Planet.Earth
+          model: Sterne.Model.Earth
         });
-        this.planets.Mars = new Sterne.PlanetView({
+        this.planets.Mars = new Sterne.View({
           size: 10,
           color: 0xBE8E60,
-          model: Sterne.Planet.Mars
+          model: Sterne.Model.Mars
         });
-        this.planets.Jupiter = new Sterne.PlanetView({
+        this.planets.Jupiter = new Sterne.View({
           size: 60,
           color: 0xB38667,
-          model: Sterne.Planet.Jupiter
+          model: Sterne.Model.Jupiter
         });
-        this.planets.Saturn = new Sterne.PlanetView({
+        this.planets.Saturn = new Sterne.View({
           size: 55,
           color: 0xCEB193,
-          model: Sterne.Planet.Saturn
+          model: Sterne.Model.Saturn
         });
-        this.planets.Uranus = new Sterne.PlanetView({
+        this.planets.Uranus = new Sterne.View({
           size: 35,
           color: 0xC0E5EB,
-          model: Sterne.Planet.Uranus
+          model: Sterne.Model.Uranus
         });
-        this.planets.Neptune = new Sterne.PlanetView({
+        this.planets.Neptune = new Sterne.View({
           size: 35,
           color: 0x6199F0,
-          model: Sterne.Planet.Neptune
+          model: Sterne.Model.Neptune
         });
         _ref = this.planets;
         for (key in _ref) {
