@@ -15,7 +15,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
     class Camera extends THREE.PerspectiveCamera
         
         el: $('#viewport')
-        distance: 2000
+        distance: 5000
         alt: Math.PI/8
         az: Math.PI/8
         
