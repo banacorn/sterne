@@ -11,12 +11,12 @@
       three: 'lib/Three',
       underscore: 'lib/underscore-min.amd',
       backbone: 'lib/backbone-min.amd',
-      hogan: 'lib/hogan-1.0.5.min.amd'
+      sterne: 'sterne'
     }
   });
 
-  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'hogan'], function($, wheel, io, THREE, _, Backbone, hogan) {
-    var App, Camera, CoordLines, Viewport;
+  require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'sterne'], function($, wheel, io, THREE, _, Backbone, Sterne) {
+    var App, Camera, CoordLines, Renderer, Viewport;
     Camera = (function(_super) {
 
       __extends(Camera, _super);
@@ -87,11 +87,6 @@
           lines.push(this.v(-10000, 0, i * 1000), this.v(10000, 0, i * 1000));
           lines.push(this.v(i * 1000, 0, -10000), this.v(i * 1000, 0, 10000));
         }
-        /*    
-        for i in [-10..10]
-        lines.push @v(i*500, 0, -10000), @v(i*500, 0, 10000)
-        */
-        console.log(lines);
         lineGeo.vertices = lines;
         lineMat = new THREE.LineBasicMaterial({
           color: 0x222222,
@@ -103,66 +98,128 @@
       }
 
       CoordLines.prototype.v = function(x, y, z) {
-        console.log(THREE.Vertex);
         return new THREE.Vertex(new THREE.Vector3(x, y, z));
       };
 
       return CoordLines;
 
     })();
+    Renderer = (function(_super) {
+
+      __extends(Renderer, _super);
+
+      function Renderer() {
+        Renderer.__super__.constructor.call(this, {
+          antialias: true
+        });
+        $('#viewport').append(this.domElement);
+        this.setClearColorHex(0x000000, 1.0);
+        this.clear();
+      }
+
+      return Renderer;
+
+    })(THREE.WebGLRenderer);
     Viewport = (function(_super) {
 
       __extends(Viewport, _super);
 
       function Viewport() {
         this.animate = __bind(this.animate, this);
+        this.render = __bind(this.render, this);
         Viewport.__super__.constructor.apply(this, arguments);
       }
 
       Viewport.prototype.el = $('#viewport');
 
-      Viewport.prototype.animate = function() {
-        var t;
-        t = new Date().getTime();
-        this.renderer.render(this.scene, this.camera);
-        return window.requestAnimationFrame(this.animate, this.renderer.domElement);
-      };
-
-      Viewport.prototype.rendererInit = function() {
-        this.renderer = new THREE.WebGLRenderer({
-          antialias: true
-        });
-        return this.$el.append(this.renderer.domElement);
-      };
-
       Viewport.prototype.initialize = function() {
-        var cube;
+        var key, planet, _ref,
+          _this = this;
+        this.time = new Sterne.Time;
         this.camera = new Camera;
-        console.log('init viewport');
-        this.rendererInit();
+        this.renderer = new Renderer;
+        this.scene = new THREE.Scene;
         this.resize();
-        this.renderer.setClearColorHex(0x000000, 1.0);
-        this.scene = new THREE.Scene();
-        cube = new THREE.Mesh(new THREE.SphereGeometry(50, 20, 20), new THREE.ParticleBasicMaterial({
-          color: 0xFFD700
-        }));
-        this.scene.add(cube);
         this.coordLines = new CoordLines;
+        this.planets = {};
+        this.planets.Sun = new Sterne.PlanetView({
+          size: 100,
+          color: 0xE95202,
+          model: Sterne.Planet.Sun
+        });
+        this.planets.Mercury = new Sterne.PlanetView({
+          size: 10,
+          color: 0x999999,
+          model: Sterne.Planet.Mercury
+        });
+        this.planets.Venus = new Sterne.PlanetView({
+          size: 20,
+          color: 0xE0DCD9,
+          model: Sterne.Planet.Venus
+        });
+        this.planets.Earth = new Sterne.PlanetView({
+          size: 20,
+          color: 0x2E3A52,
+          model: Sterne.Planet.Earth
+        });
+        this.planets.Mars = new Sterne.PlanetView({
+          size: 10,
+          color: 0xBE8E60,
+          model: Sterne.Planet.Mars
+        });
+        this.planets.Jupiter = new Sterne.PlanetView({
+          size: 60,
+          color: 0xB38667,
+          model: Sterne.Planet.Jupiter
+        });
+        this.planets.Saturn = new Sterne.PlanetView({
+          size: 55,
+          color: 0xCEB193,
+          model: Sterne.Planet.Saturn
+        });
+        this.planets.Uranus = new Sterne.PlanetView({
+          size: 35,
+          color: 0xC0E5EB,
+          model: Sterne.Planet.Uranus
+        });
+        this.planets.Neptune = new Sterne.PlanetView({
+          size: 35,
+          color: 0x6199F0,
+          model: Sterne.Planet.Neptune
+        });
+        _ref = this.planets;
+        for (key in _ref) {
+          planet = _ref[key];
+          this.scene.add(planet.view);
+        }
         this.scene.add(this.coordLines);
-        /*
-                    @light0 = new THREE.AmbientLight(50, 500, 50);
-                    @light0.position.set 0, 10000, 0
-                    @scene.add @light0
-        */
-        return this.animate();
+        this.animate();
+        return setInterval(function() {
+          var time;
+          time = _this.time.date.getTime();
+          time += 86400000;
+          return _this.time.date.setTime(time);
+        }, 40);
       };
 
       Viewport.prototype.render = function() {
-        return this.renderer.render(this.scene, this.camera);
+        var key, planet, _ref, _results;
+        this.renderer.render(this.scene, this.camera);
+        _ref = this.planets;
+        _results = [];
+        for (key in _ref) {
+          planet = _ref[key];
+          _results.push(planet.render(this.time));
+        }
+        return _results;
+      };
+
+      Viewport.prototype.animate = function() {
+        this.render();
+        return window.requestAnimationFrame(this.animate, this.renderer.domElement);
       };
 
       Viewport.prototype.resize = function() {
-        console.log('resize viewport');
         this.width = $(window).width();
         this.height = $(window).height() - 5;
         this.renderer.setSize(this.width, this.height);
