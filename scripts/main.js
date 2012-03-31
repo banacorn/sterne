@@ -133,7 +133,7 @@
       Viewport.prototype.el = $('#viewport');
 
       Viewport.prototype.initialize = function() {
-        var key, planet, _ref,
+        var planet, _i, _len, _ref,
           _this = this;
         this.time = new Sterne.Time;
         this.camera = new Camera;
@@ -141,55 +141,19 @@
         this.scene = new THREE.Scene;
         this.resize();
         this.coordLines = new CoordLines;
-        this.planets = {};
-        this.planets.Sun = new Sterne.View({
-          size: 100,
-          color: 0xE95202,
-          model: Sterne.Model.Sun
-        });
-        this.planets.Mercury = new Sterne.View({
-          size: 10,
-          color: 0x999999,
-          model: Sterne.Model.Mercury
-        });
-        this.planets.Venus = new Sterne.View({
-          size: 20,
-          color: 0xE0DCD9,
-          model: Sterne.Model.Venus
-        });
-        this.planets.Earth = new Sterne.View({
-          size: 20,
-          color: 0x2E3A52,
-          model: Sterne.Model.Earth
-        });
-        this.planets.Mars = new Sterne.View({
-          size: 10,
-          color: 0xBE8E60,
-          model: Sterne.Model.Mars
-        });
-        this.planets.Jupiter = new Sterne.View({
-          size: 60,
-          color: 0xB38667,
-          model: Sterne.Model.Jupiter
-        });
-        this.planets.Saturn = new Sterne.View({
-          size: 55,
-          color: 0xCEB193,
-          model: Sterne.Model.Saturn
-        });
-        this.planets.Uranus = new Sterne.View({
-          size: 35,
-          color: 0xC0E5EB,
-          model: Sterne.Model.Uranus
-        });
-        this.planets.Neptune = new Sterne.View({
-          size: 35,
-          color: 0x6199F0,
-          model: Sterne.Model.Neptune
-        });
-        _ref = this.planets;
-        for (key in _ref) {
-          planet = _ref[key];
+        this.planets = new Sterne.Collection;
+        this.planets.push(Sterne.Model.Sun);
+        this.planets.push(Sterne.Model.Mercury);
+        this.planets.push(Sterne.Model.Venus);
+        this.planets.push(Sterne.Model.Earth);
+        this.planets.push(Sterne.Model.Mars);
+        this.planets.push(Sterne.Model.Jupiter);
+        this.planets.push(Sterne.Model.Saturn);
+        this.planets.push(Sterne.Model.Uranus);
+        this.planets.push(Sterne.Model.Neptune);
+        _ref = this.planets.models;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          planet = _ref[_i];
           this.scene.add(planet.view);
         }
         this.scene.add(this.coordLines);
@@ -203,15 +167,8 @@
       };
 
       Viewport.prototype.render = function() {
-        var key, planet, _ref, _results;
         this.renderer.render(this.scene, this.camera);
-        _ref = this.planets;
-        _results = [];
-        for (key in _ref) {
-          planet = _ref[key];
-          _results.push(planet.render(this.time));
-        }
-        return _results;
+        return this.planets.render(this.time);
       };
 
       Viewport.prototype.animate = function() {
