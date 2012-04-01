@@ -19,7 +19,7 @@
     }
   });
   require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'sterne'], function($, wheel, io, THREE, _, Backbone, Sterne) {
-    var App, Camera, CoordLines, Renderer, Scene, Viewport;
+    var App, Camera, Objekt, Renderer, Scene, Viewport;
     Camera = (function() {
       __extends(Camera, THREE.PerspectiveCamera);
       Camera.prototype.el = $('#viewport');
@@ -84,16 +84,22 @@
       };
       return Camera;
     })();
-    CoordLines = (function() {
-      function CoordLines() {
-        var i, line, lineGeo, lineMat, lines;
-        lineGeo = new THREE.Geometry();
-        lines = [];
+    Objekt = (function() {
+      function Objekt() {
+        this.grid = this.makeGrid();
+      }
+      Objekt.prototype.makeGrid = function() {
+        var grid, i, line, lineGeo, lineMat, v;
+        v = function(x, y, z) {
+          return new THREE.Vertex(new THREE.Vector3(x, y, z));
+        };
+        grid = [];
         for (i = -30; i <= 30; i++) {
-          lines.push(this.v(-30000, 0, i * 1000), this.v(30000, 0, i * 1000));
-          lines.push(this.v(i * 1000, 0, -30000), this.v(i * 1000, 0, 30000));
+          grid.push(v(-30000, 0, i * 1000), v(30000, 0, i * 1000));
+          grid.push(v(i * 1000, 0, -30000), v(i * 1000, 0, 30000));
         }
-        lineGeo.vertices = lines;
+        lineGeo = new THREE.Geometry();
+        lineGeo.vertices = grid;
         lineMat = new THREE.LineBasicMaterial({
           color: 0x202020,
           lineWidth: 1
@@ -101,11 +107,8 @@
         line = new THREE.Line(lineGeo, lineMat);
         line.type = THREE.Lines;
         return line;
-      }
-      CoordLines.prototype.v = function(x, y, z) {
-        return new THREE.Vertex(new THREE.Vector3(x, y, z));
       };
-      return CoordLines;
+      return Objekt;
     })();
     Scene = (function() {
       __extends(Scene, THREE.Scene);
@@ -154,7 +157,7 @@
         this.renderer = new Renderer;
         this.scene = new Scene;
         this.resize();
-        this.coordLines = new CoordLines;
+        this.objekt = new Objekt;
         this.planets = new Sterne.Collection;
         this.planets.push(Sterne.Model.Sun);
         this.planets.push(Sterne.Model.Mercury);
@@ -170,7 +173,7 @@
           planet = _ref[_i];
           this.scene.add(planet.view);
         }
-        this.scene.add(this.coordLines);
+        this.scene.add(this.objekt.grid);
         this.animate();
         return setInterval(__bind(function() {
           var time;

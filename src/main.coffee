@@ -62,19 +62,24 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 @distance = 100 if @distance < 100                                       
                 @update()
     
-    
-
-    class CoordLines
+    class Objekt
     
         constructor: ->
-            lineGeo = new THREE.Geometry()            
-            lines = []            
+            @grid = @makeGrid()
+    
+        makeGrid: ->
         
+            v = (x, y, z) -> 
+                new THREE.Vertex new THREE.Vector3 x, y, z
+                
+                
+            grid = []
             for i in [-30..30]
-                lines.push @v(-30000, 0, i*1000), @v(30000, 0, i*1000)
-                lines.push @v(i*1000, 0, -30000), @v(i*1000, 0, 30000)
+                grid.push v(-30000, 0, i*1000), v(30000, 0, i*1000)
+                grid.push v(i*1000, 0, -30000), v(i*1000, 0, 30000)
             
-            lineGeo.vertices = lines
+            lineGeo = new THREE.Geometry() 
+            lineGeo.vertices = grid
             lineMat = new THREE.LineBasicMaterial
                 color: 0x202020
                 lineWidth: 1
@@ -82,10 +87,6 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             line.type = THREE.Lines
             return line
             
-            
-        v: (x, y, z) -> 
-            new THREE.Vertex new THREE.Vector3 x, y, z
-    
     class Scene extends THREE.Scene
     
         add: (obj) -> if Array.isArray obj then super e for e in obj else super obj
@@ -112,10 +113,10 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         
             @camera = new Camera        
             @renderer = new Renderer
-            @scene = new Scene            
+            @scene = new Scene 
             @resize()
             
-            @coordLines = new CoordLines
+            @objekt = new Objekt
             
             
             @planets = new Sterne.Collection
@@ -133,8 +134,9 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             for planet in @planets.models
                 @scene.add planet.view
                 
-                
-            @scene.add @coordLines
+            @scene.add @objekt.grid
+            
+            
             @animate()
             
         
