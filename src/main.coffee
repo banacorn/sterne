@@ -64,13 +64,13 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             lineGeo = new THREE.Geometry()            
             lines = []            
             
-            for i in [-10..10]
-                lines.push @v(-10000, 0, i*1000), @v(10000, 0, i*1000)
-                lines.push @v(i*1000, 0, -10000), @v(i*1000, 0, 10000)
+            for i in [-30..30]
+                lines.push @v(-30000, 0, i*1000), @v(30000, 0, i*1000)
+                lines.push @v(i*1000, 0, -30000), @v(i*1000, 0, 30000)
             
             lineGeo.vertices = lines
             lineMat = new THREE.LineBasicMaterial
-                color: 0x222222
+                color: 0x202020
                 lineWidth: 1
             line = new THREE.Line lineGeo, lineMat
             line.type = THREE.Lines

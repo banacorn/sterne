@@ -83,13 +83,13 @@
         var i, line, lineGeo, lineMat, lines;
         lineGeo = new THREE.Geometry();
         lines = [];
-        for (i = -10; i <= 10; i++) {
-          lines.push(this.v(-10000, 0, i * 1000), this.v(10000, 0, i * 1000));
-          lines.push(this.v(i * 1000, 0, -10000), this.v(i * 1000, 0, 10000));
+        for (i = -30; i <= 30; i++) {
+          lines.push(this.v(-30000, 0, i * 1000), this.v(30000, 0, i * 1000));
+          lines.push(this.v(i * 1000, 0, -30000), this.v(i * 1000, 0, 30000));
         }
         lineGeo.vertices = lines;
         lineMat = new THREE.LineBasicMaterial({
-          color: 0x222222,
+          color: 0x202020,
           lineWidth: 1
         });
         line = new THREE.Line(lineGeo, lineMat);
