@@ -58,7 +58,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             @el.mousewheel (e, delta) =>            
                 @distance *= 0.8 if delta > 0
                 @distance *= 1.25 if delta < 0    
-                @distance = 20000 if @distance > 20000
+                @distance = 30000 if @distance > 30000
                 @distance = 100 if @distance < 100                                       
                 @update()
             

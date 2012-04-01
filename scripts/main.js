@@ -73,7 +73,7 @@
         return this.el.mousewheel(function(e, delta) {
           if (delta > 0) _this.distance *= 0.8;
           if (delta < 0) _this.distance *= 1.25;
-          if (_this.distance > 20000) _this.distance = 20000;
+          if (_this.distance > 30000) _this.distance = 30000;
           if (_this.distance < 100) _this.distance = 100;
           return _this.update();
         });
