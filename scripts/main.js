@@ -1,8 +1,12 @@
 (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require.config({
     paths: {
       jquery: 'lib/jquery-1.7.1.min',
@@ -14,28 +18,20 @@
       sterne: 'sterne'
     }
   });
-
   require(['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone', 'sterne'], function($, wheel, io, THREE, _, Backbone, Sterne) {
-    var App, Camera, CoordLines, Renderer, Viewport;
-    Camera = (function(_super) {
-
-      __extends(Camera, _super);
-
+    var App, Camera, CoordLines, Renderer, Scene, Viewport;
+    Camera = (function() {
+      __extends(Camera, THREE.PerspectiveCamera);
       Camera.prototype.el = $('#viewport');
-
       Camera.prototype.distance = 5000;
-
       Camera.prototype.alt = Math.PI / 8;
-
       Camera.prototype.az = Math.PI / 8;
-
       function Camera() {
         Camera.__super__.constructor.call(this, 45, $(window).width() / $(window).height(), 1, 100000);
         this.update();
         this.onDrag();
         this.onScroll();
       }
-
       Camera.prototype.update = function() {
         this.position.x = (this.distance * Math.cos(this.az)) * Math.cos(this.alt);
         this.position.z = (this.distance * Math.sin(this.az)) * Math.cos(this.alt);
@@ -46,44 +42,49 @@
           z: 0
         });
       };
-
       Camera.prototype.onDrag = function() {
-        var _this = this;
-        this.el.mousedown(function(e) {
+        this.el.mousedown(__bind(function(e) {
           var startX, startY;
           startX = e.clientX;
           startY = e.clientY;
-          return _this.el.mousemove(function(e) {
-            _this.az += (e.clientX - startX) * 0.002;
-            _this.alt += (e.clientY - startY) * 0.002;
-            if (_this.alt > Math.PI / 2) _this.alt = Math.PI / 2;
-            if (_this.alt < -Math.PI / 2) _this.alt = -Math.PI / 2;
-            _this.update();
+          return this.el.mousemove(__bind(function(e) {
+            this.az += (e.clientX - startX) * 0.002;
+            this.alt += (e.clientY - startY) * 0.002;
+            if (this.alt > Math.PI / 2) {
+              this.alt = Math.PI / 2;
+            }
+            if (this.alt < -Math.PI / 2) {
+              this.alt = -Math.PI / 2;
+            }
+            this.update();
             startX = e.clientX;
             return startY = e.clientY;
-          });
-        });
-        return this.el.mouseup(function(e) {
-          return _this.el.off('mousemove');
-        });
+          }, this));
+        }, this));
+        return this.el.mouseup(__bind(function(e) {
+          return this.el.off('mousemove');
+        }, this));
       };
-
       Camera.prototype.onScroll = function() {
-        var _this = this;
-        return this.el.mousewheel(function(e, delta) {
-          if (delta > 0) _this.distance *= 0.8;
-          if (delta < 0) _this.distance *= 1.25;
-          if (_this.distance > 30000) _this.distance = 30000;
-          if (_this.distance < 100) _this.distance = 100;
-          return _this.update();
-        });
+        return this.el.mousewheel(__bind(function(e, delta) {
+          if (delta > 0) {
+            this.distance *= 0.8;
+          }
+          if (delta < 0) {
+            this.distance *= 1.25;
+          }
+          if (this.distance > 30000) {
+            this.distance = 30000;
+          }
+          if (this.distance < 100) {
+            this.distance = 100;
+          }
+          return this.update();
+        }, this));
       };
-
       return Camera;
-
-    })(THREE.PerspectiveCamera);
+    })();
     CoordLines = (function() {
-
       function CoordLines() {
         var i, line, lineGeo, lineMat, lines;
         lineGeo = new THREE.Geometry();
@@ -101,18 +102,33 @@
         line.type = THREE.Lines;
         return line;
       }
-
       CoordLines.prototype.v = function(x, y, z) {
         return new THREE.Vertex(new THREE.Vector3(x, y, z));
       };
-
       return CoordLines;
-
     })();
-    Renderer = (function(_super) {
-
-      __extends(Renderer, _super);
-
+    Scene = (function() {
+      __extends(Scene, THREE.Scene);
+      function Scene() {
+        Scene.__super__.constructor.apply(this, arguments);
+      }
+      Scene.prototype.add = function(obj) {
+        var e, _i, _len, _results;
+        if (Array.isArray(obj)) {
+          _results = [];
+          for (_i = 0, _len = obj.length; _i < _len; _i++) {
+            e = obj[_i];
+            _results.push(Scene.__super__.add.call(this, e));
+          }
+          return _results;
+        } else {
+          return Scene.__super__.add.call(this, obj);
+        }
+      };
+      return Scene;
+    })();
+    Renderer = (function() {
+      __extends(Renderer, THREE.WebGLRenderer);
       function Renderer() {
         Renderer.__super__.constructor.call(this, {
           antialias: true
@@ -121,29 +137,22 @@
         this.setClearColorHex(0x000000, 1.0);
         this.clear();
       }
-
       return Renderer;
-
-    })(THREE.WebGLRenderer);
-    Viewport = (function(_super) {
-
-      __extends(Viewport, _super);
-
+    })();
+    Viewport = (function() {
+      __extends(Viewport, Backbone.View);
       function Viewport() {
         this.animate = __bind(this.animate, this);
         this.render = __bind(this.render, this);
         Viewport.__super__.constructor.apply(this, arguments);
       }
-
       Viewport.prototype.el = $('#viewport');
-
       Viewport.prototype.initialize = function() {
-        var planet, _i, _len, _ref,
-          _this = this;
+        var planet, _i, _len, _ref;
         this.time = new Sterne.Time;
         this.camera = new Camera;
         this.renderer = new Renderer;
-        this.scene = new THREE.Scene;
+        this.scene = new Scene;
         this.resize();
         this.coordLines = new CoordLines;
         this.planets = new Sterne.Collection;
@@ -163,24 +172,21 @@
         }
         this.scene.add(this.coordLines);
         this.animate();
-        return setInterval(function() {
+        return setInterval(__bind(function() {
           var time;
-          time = _this.time.date.getTime();
+          time = this.time.date.getTime();
           time += 8640000;
-          return _this.time.date.setTime(time);
-        }, 10);
+          return this.time.date.setTime(time);
+        }, this), 10);
       };
-
       Viewport.prototype.render = function() {
         this.renderer.render(this.scene, this.camera);
         return this.planets.render(this.time);
       };
-
       Viewport.prototype.animate = function() {
         this.render();
         return window.requestAnimationFrame(this.animate, this.renderer.domElement);
       };
-
       Viewport.prototype.resize = function() {
         this.width = $(window).width();
         this.height = $(window).height() - 5;
@@ -188,39 +194,28 @@
         this.camera.aspect = this.width / this.height;
         return this.camera.updateProjectionMatrix();
       };
-
       return Viewport;
-
-    })(Backbone.View);
-    App = (function(_super) {
-
-      __extends(App, _super);
-
+    })();
+    App = (function() {
+      __extends(App, Backbone.View);
       function App() {
         App.__super__.constructor.apply(this, arguments);
       }
-
       App.prototype.el = $(window);
-
       App.prototype.initialize = function() {
         return this.viewport = new Viewport;
       };
-
       App.prototype.events = {
         'resize': 'resize'
       };
-
       App.prototype.resize = function() {
         return this.viewport.resize();
       };
-
       return App;
-
-    })(Backbone.View);
+    })();
     return $(function() {
       var app;
       return app = new App;
     });
   });
-
 }).call(this);

@@ -61,7 +61,8 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 @distance = 30000 if @distance > 30000
                 @distance = 100 if @distance < 100                                       
                 @update()
-            
+    
+    
 
     class CoordLines
     
@@ -85,7 +86,9 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         v: (x, y, z) -> 
             new THREE.Vertex new THREE.Vector3 x, y, z
     
-            
+    class Scene extends THREE.Scene
+    
+        add: (obj) -> if Array.isArray obj then super e for e in obj else super obj
 
     class Renderer extends THREE.WebGLRenderer
         constructor: ->
@@ -109,7 +112,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         
             @camera = new Camera        
             @renderer = new Renderer
-            @scene = new THREE.Scene            
+            @scene = new Scene            
             @resize()
             
             @coordLines = new CoordLines
@@ -144,6 +147,8 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
         render: =>
             @renderer.render @scene, @camera
             @planets.render @time
+            
+            
         animate: =>
             @render()
             window.requestAnimationFrame(@animate, @renderer.domElement);
