@@ -3,8 +3,8 @@ define ['backbone', 'three'], (Backbone, THREE) ->
     
         constructor: (@date = new Date) ->
         
-        julianCentury: -> (367 * @date.getUTCFullYear() - Math.floor(7 * (@date.getUTCFullYear() + Math.floor((@date.getUTCMonth() + 10) / 12)) / 4) + Math.floor(275 * (@date.getUTCMonth() + 1) / 9) + @date.getUTCDate() - 730531.5 + @date.getUTCHours() / 24 + @date.getUTCMinutes() / 1440 + @date.getUTCSeconds() / 86400) / 36525;   
-        
+        julianCentury: -> 
+            (367 * @date.getUTCFullYear() - Math.floor(7 * (@date.getUTCFullYear() + Math.floor((@date.getUTCMonth() + 10) / 12)) / 4) + Math.floor(275 * (@date.getUTCMonth() + 1) / 9) + @date.getUTCDate() - 730531.5 + @date.getUTCHours() / 24 + @date.getUTCMinutes() / 1440 + @date.getUTCSeconds() / 86400) / 36525          
         
         julianDate: ->
             y = @date.getUTCFullYear() + 4800 - Math.floor((13 - @date.getUTCMonth()) / 12)            
@@ -14,47 +14,27 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-    class Model extends Backbone.Model
+    
+    class Model 
+        constructor: (init) ->
         
-        defaults:
-            elem: [
+            @elem = init.elem || [
                 { a: 0, e: 0, i: 0, O: 0, o: 0, L: 0 }
                 { a: 0, e: 0, i: 0, O: 0, o: 0, L: 0 }
             ]
-            name: 'planet'
-            color: 0xAAAAAA
-            radius: 10
-    
-        initialize: (options) ->
-            @elem = options.elem
-            @name = options.name
-            @radius = options.radius
-            @color = options.color            
-            @time = new Time
-            @view = new THREE.Mesh new THREE.SphereGeometry(@radius, 20, 20), new THREE.ParticleBasicMaterial color: @color
+            @name = init.name
+            @radius = init.radius
+            @color = init.color
+            
+                  
+            
+        update: (@time = @time) ->
         
         
-        position: (@time = @time) ->
-        
-            CY = @time.julianCentury();
+            CY = @time.julianCentury()
             RAD = Math.PI / 180
             TAU = Math.PI * 2
+            
         
             @a = @elem[0].a + @elem[1].a * CY
             @e = @elem[0].e + @elem[1].e * CY
@@ -62,6 +42,7 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             @O = (@elem[0].O + @elem[1].O * CY) * RAD
             @o = (@elem[0].o + @elem[1].o * CY) * RAD
             @L = ((@elem[0].L + @elem[1].L * CY) * RAD) % TAU
+            
             
             @M = (@L - @o + TAU) % TAU
             
@@ -81,7 +62,8 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             @x = @R * (Math.cos(@O) * Math.cos(@V + @o - @O) - Math.sin(@O) * Math.sin(@V + @o - @O) * Math.cos(@i));
             @y = @R * (Math.sin(@O) * Math.cos(@V + @o - @O) +  Math.cos(@O) * Math.sin(@V + @o - @O) * Math.cos(@i));
             @z = @R * (Math.sin(@V + @o - @O) * Math.sin(@i));
-        
+            
+    
         @Sun: new Model 
             elem: [
                 { a: 0, e: 0, i: 0, O: 0, o: 0, L: 0 }
@@ -134,6 +116,7 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             elem: [
                 { a: 9.53667594, e: 0.05386179, i: 2.48599187, O: 113.66242448, o: 92.59887831, L: 49.95424423 }
                 { a: -0.00125060, e: -0.00050991, i: 0.00193609, O: -0.28867794, o: -0.41897216, L: 1222.49362201 }
+            @view = new THREE.Mesh new THREE.SphereGeometry(@radius, 20, 20), new THREE.ParticleBasicMaterial color: @color
             ]
             name: 'Saturn'
             radius: 55
@@ -154,20 +137,37 @@ define ['backbone', 'three'], (Backbone, THREE) ->
             name: 'Neptune'
             radius: 35
             color: 0x6199F0
-           
-    class Collection extends Backbone.Collection
-        model: Model
+            
+            
+            
+    class View
+        constructor: (@model) ->
+            
+            @view = new THREE.Mesh new THREE.SphereGeometry(@model.radius, 20, 20), new THREE.ParticleBasicMaterial color: @model.color
         
-        render: (@time) =>
-            for planet in @models
-                planet.position(@time)
-                planet.view.position.x = planet.x * -1000
-                planet.view.position.y = planet.z * 1000
-                planet.view.position.z = planet.y * 1000 
-    
+        update: (time) ->
+            @model.update time
+            @view.position.x = @model.x * -1000
+            @view.position.z = @model.y * 1000
+            @view.position.y = @model.z * 1000
+            
+            
+    class Collection
+        constructor: (@models) ->
+        
+        update: (time) -> model.update time for model in @models
+        
+        addBy: (@scene) ->
+            for model in @models
+                @scene.add model.view
+            
+            
+            
+            
             
     return (
         Time: Time
         Model: Model
+        View: View
         Collection: Collection
     )

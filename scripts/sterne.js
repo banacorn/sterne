@@ -1,40 +1,25 @@
 (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   define(['backbone', 'three'], function(Backbone, THREE) {
-    var Collection, Model, Time;
+    var Collection, Model, Time, View;
     Time = (function() {
-
       function Time(date) {
         this.date = date != null ? date : new Date;
       }
-
       Time.prototype.julianCentury = function() {
         return (367 * this.date.getUTCFullYear() - Math.floor(7 * (this.date.getUTCFullYear() + Math.floor((this.date.getUTCMonth() + 10) / 12)) / 4) + Math.floor(275 * (this.date.getUTCMonth() + 1) / 9) + this.date.getUTCDate() - 730531.5 + this.date.getUTCHours() / 24 + this.date.getUTCMinutes() / 1440 + this.date.getUTCSeconds() / 86400) / 36525;
       };
-
       Time.prototype.julianDate = function() {
         var m, y;
         y = this.date.getUTCFullYear() + 4800 - Math.floor((13 - this.date.getUTCMonth()) / 12);
         m = this.date.getUTCMonth() + Math.floor((13 - this.date.getUTCMonth()) / 12) * 12 - 2;
         return this.date.getUTCDate() + Math.floor((m * 153 + 2) / 5) + y * 365 + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045 + (this.date.getUTCHours() - 12) / 24 + this.date.getUTCMinutes() / 1440 + this.date.getUTCSeconds() / 86400;
       };
-
       return Time;
-
     })();
-    Model = (function(_super) {
-
-      __extends(Model, _super);
-
-      function Model() {
-        Model.__super__.constructor.apply(this, arguments);
-      }
-
-      Model.prototype.defaults = {
-        elem: [
+    Model = (function() {
+      function Model(init) {
+        this.elem = init.elem || [
           {
             a: 0,
             e: 0,
@@ -50,26 +35,13 @@
             o: 0,
             L: 0
           }
-        ],
-        name: 'planet',
-        color: 0xAAAAAA,
-        radius: 10
-      };
-
-      Model.prototype.initialize = function(options) {
-        this.elem = options.elem;
-        this.name = options.name;
-        this.radius = options.radius;
-        this.color = options.color;
-        this.time = new Time;
-        return this.view = new THREE.Mesh(new THREE.SphereGeometry(this.radius, 20, 20), new THREE.ParticleBasicMaterial({
-          color: this.color
-        }));
-      };
-
-      Model.prototype.position = function(time) {
-        var CY, E, E1, RAD, TAU, iter,
-          _this = this;
+        ];
+        this.name = init.name;
+        this.radius = init.radius;
+        this.color = init.color;
+      }
+      Model.prototype.update = function(time) {
+        var CY, E, E1, RAD, TAU, iter;
         this.time = time != null ? time : this.time;
         CY = this.time.julianCentury();
         RAD = Math.PI / 180;
@@ -83,10 +55,10 @@
         this.M = (this.L - this.o + TAU) % TAU;
         E = this.M + this.e * Math.sin(this.M) * (1 + this.e * Math.cos(this.M));
         E1 = 0;
-        iter = function() {
+        iter = __bind(function() {
           E1 = E;
-          return E = E1 - (E1 - _this.e * Math.sin(E1) - _this.M) / (1 - _this.e * Math.cos(E1));
-        };
+          return E = E1 - (E1 - this.e * Math.sin(E1) - this.M) / (1 - this.e * Math.cos(E1));
+        }, this);
         while (Math.abs(E - E1) > 0.000001) {
           iter();
         }
@@ -96,7 +68,6 @@
         this.y = this.R * (Math.sin(this.O) * Math.cos(this.V + this.o - this.O) + Math.cos(this.O) * Math.sin(this.V + this.o - this.O) * Math.cos(this.i));
         return this.z = this.R * (Math.sin(this.V + this.o - this.O) * Math.sin(this.i));
       };
-
       Model.Sun = new Model({
         elem: [
           {
@@ -119,7 +90,6 @@
         radius: 100,
         color: 0xE95202
       });
-
       Model.Mercury = new Model({
         elem: [
           {
@@ -142,7 +112,6 @@
         radius: 10,
         color: 0x999999
       });
-
       Model.Venus = new Model({
         elem: [
           {
@@ -165,7 +134,6 @@
         radius: 15,
         color: 0xE0DCD9
       });
-
       Model.Earth = new Model({
         elem: [
           {
@@ -188,7 +156,6 @@
         radius: 20,
         color: 0x2E3A52
       });
-
       Model.Mars = new Model({
         elem: [
           {
@@ -211,7 +178,6 @@
         radius: 10,
         color: 0xBE8E60
       });
-
       Model.Jupiter = new Model({
         elem: [
           {
@@ -234,7 +200,6 @@
         radius: 60,
         color: 0xB38667
       });
-
       Model.Saturn = new Model({
         elem: [
           {
@@ -251,13 +216,14 @@
             O: -0.28867794,
             o: -0.41897216,
             L: 1222.49362201
-          }
+          }, Model.view = new THREE.Mesh(new THREE.SphereGeometry(Model.radius, 20, 20), new THREE.ParticleBasicMaterial({
+            color: Model.color
+          }))
         ],
         name: 'Saturn',
         radius: 55,
         color: 0xCEB193
       });
-
       Model.Uranus = new Model({
         elem: [
           {
@@ -280,7 +246,6 @@
         radius: 35,
         color: 0xC0E5EB
       });
-
       Model.Neptune = new Model({
         elem: [
           {
@@ -303,44 +268,55 @@
         radius: 35,
         color: 0x6199F0
       });
-
       return Model;
-
-    })(Backbone.Model);
-    Collection = (function(_super) {
-
-      __extends(Collection, _super);
-
-      function Collection() {
-        this.render = __bind(this.render, this);
-        Collection.__super__.constructor.apply(this, arguments);
+    })();
+    View = (function() {
+      function View(model) {
+        this.model = model;
+        this.view = new THREE.Mesh(new THREE.SphereGeometry(this.model.radius, 20, 20), new THREE.ParticleBasicMaterial({
+          color: this.model.color
+        }));
       }
-
-      Collection.prototype.model = Model;
-
-      Collection.prototype.render = function(time) {
-        var planet, _i, _len, _ref, _results;
-        this.time = time;
+      View.prototype.update = function(time) {
+        this.model.update(time);
+        this.view.position.x = this.model.x * -1000;
+        this.view.position.z = this.model.y * 1000;
+        return this.view.position.y = this.model.z * 1000;
+      };
+      return View;
+    })();
+    Collection = (function() {
+      function Collection(models) {
+        this.models = models;
+      }
+      Collection.prototype.update = function(time) {
+        var model, _i, _len, _ref, _results;
         _ref = this.models;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          planet = _ref[_i];
-          planet.position(this.time);
-          planet.view.position.x = planet.x * -1000;
-          planet.view.position.y = planet.z * 1000;
-          _results.push(planet.view.position.z = planet.y * 1000);
+          model = _ref[_i];
+          _results.push(model.update(time));
         }
         return _results;
       };
-
+      Collection.prototype.addBy = function(scene) {
+        var model, _i, _len, _ref, _results;
+        this.scene = scene;
+        _ref = this.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          model = _ref[_i];
+          _results.push(this.scene.add(model.view));
+        }
+        return _results;
+      };
       return Collection;
-
-    })(Backbone.Collection);
+    })();
     return {
       Time: Time,
       Model: Model,
+      View: View,
       Collection: Collection
     };
   });
-
 }).call(this);

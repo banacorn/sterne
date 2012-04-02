@@ -14,6 +14,7 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
 
     class Camera extends THREE.PerspectiveCamera
         
+
         el: $('#viewport')
         distance: 5000
         alt: Math.PI/8
@@ -62,12 +63,13 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 @distance = 100 if @distance < 100                                       
                 @update()
     
-    class Objekt
+    class Obj
     
         constructor: ->
-            @grid = @makeGrid()
+            @initGrid()
+            @initPlanet()
     
-        makeGrid: ->
+        initGrid: ->
         
             v = (x, y, z) -> 
                 new THREE.Vertex new THREE.Vector3 x, y, z
@@ -85,7 +87,26 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
                 lineWidth: 1
             line = new THREE.Line lineGeo, lineMat
             line.type = THREE.Lines
-            return line
+            
+            @grid = 
+                view: line
+            
+        initPlanet: ->
+            
+            @planet = new Sterne.Collection [
+                new Sterne.View Sterne.Model.Sun
+                new Sterne.View Sterne.Model.Mercury
+                new Sterne.View Sterne.Model.Venus
+                new Sterne.View Sterne.Model.Earth
+                new Sterne.View Sterne.Model.Mars
+                new Sterne.View Sterne.Model.Jupiter
+                new Sterne.View Sterne.Model.Saturn
+                new Sterne.View Sterne.Model.Uranus
+                new Sterne.View Sterne.Model.Neptune
+            ]
+            
+                
+                
             
     class Scene extends THREE.Scene
     
@@ -116,26 +137,12 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             @scene = new Scene 
             @resize()
             
-            @objekt = new Objekt
+            @obj = new Obj
+            
+            @scene.add @obj.grid.view
             
             
-            @planets = new Sterne.Collection
-            
-            @planets.push Sterne.Model.Sun
-            @planets.push Sterne.Model.Mercury
-            @planets.push Sterne.Model.Venus
-            @planets.push Sterne.Model.Earth
-            @planets.push Sterne.Model.Mars
-            @planets.push Sterne.Model.Jupiter
-            @planets.push Sterne.Model.Saturn
-            @planets.push Sterne.Model.Uranus
-            @planets.push Sterne.Model.Neptune
-            
-            for planet in @planets.models
-                @scene.add planet.view
-                
-            @scene.add @objekt.grid
-            
+            @obj.planet.addBy @scene
             
             @animate()
             
@@ -147,8 +154,8 @@ require ['order!jquery', 'order!wheel', 'io', 'three', 'underscore', 'backbone',
             , 10
         
         render: =>
-            @renderer.render @scene, @camera
-            @planets.render @time
+            @renderer.render @scene, @camera            
+            @obj.planet.update @time
             
             
         animate: =>
